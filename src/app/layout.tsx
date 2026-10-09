@@ -2,8 +2,8 @@ import type { Metadata } from 'next';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'Triage • Local-First AI Chat Dashboard',
-  description: 'Minimalist 2D triage dashboard solving the unread chat problem with local NLP and auto-extracted action items.',
+  title: 'SummaryX • Local-First AI WhatsApp Triage',
+  description: 'Ultra-modern local-first WhatsApp chat triage dashboard with dynamic NLP, temporal scrubber clock, and auto-extracted action items.',
 };
 
 export default function RootLayout({

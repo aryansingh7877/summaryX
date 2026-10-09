@@ -62,7 +62,7 @@ export const Header: React.FC = () => {
 
             <div className="flex items-center gap-1.5">
               <span className="text-sm font-extrabold tracking-tight font-sans text-[#0F172A]">
-                TRIAGE
+                SummaryX
               </span>
               <span className="text-[10px] font-mono px-2 py-0.5 rounded-full font-semibold bg-slate-100 text-slate-700 border border-slate-200">
                 WHATSAPP
