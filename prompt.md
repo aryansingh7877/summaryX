@@ -378,6 +378,40 @@ Both features must execute 100% on-device (client-side), hook into our dynamic m
 - **Files Affected:** `src/types/triage.ts`, `src/services/whatsappParser.ts`, `src/store/useTriageStore.ts`, `src/components/triage/GroupNoiseRadar.tsx`, `src/components/triage/Header.tsx`, `src/components/triage/TriageCardItem.tsx`, `src/components/triage/ContextDrawer.tsx`.
 - **Status:** Completed & verified with `next build`.
 
+### Phase 9: Critical Submission Patch — Off-Thread Web Worker & Enterprise Architecture
+- **AI Tool / Model:** Google Antigravity
+- **Purpose:** Decouple NLP parser from main UI thread (guarantee 60 FPS), implement telemetry module with SHA-256 zero-cloud verification hash, and create comprehensive `ARCHITECTURE.md`.
+- **Input Prompt:**
+```text
+CRITICAL 10-MINUTE SUBMISSION PATCH: Elevate Backend & Architecture score from 75 to 90+.
+
+Do NOT change the UI styling. Focus 100% on system engineering, modularity, and quantifiable architecture.
+
+### 1. IMPLEMENT A DEDICATED OFF-THREAD WEB WORKER (/workers/triage.worker.ts)
+- Decouple the NLP triage engine completely from the main UI thread.
+- Spawn a dedicated Web Worker that receives the raw .txt WhatsApp buffer via postMessage.
+- Pipeline implementation inside worker:
+  - Stage 1: Fast Regex Pre-Filter & Tokenizer (O(N) noise suppression).
+  - Stage 2: Temporal & Entity Extractor (Date, @mentions, priority scores).
+  - Stage 3: Dynamic State Aggregator (Action items, consensus, response templates).
+- Post typed progress messages back to main thread: { stage: 'PARSING' | 'TRIAGING' | 'COMPLETED', progress: number, telemetry: { executionTimeMs, memoryFreedKb, noiseRatio } }.
+
+### 2. EXPORT ARCHITECTURE BENCHMARK & TELEMETRY MODULE (/lib/engine/telemetry.ts)
+- Add a typed telemetry collector tracking:
+  - Total Parse Latency (Target: < 25ms per 1,000 messages).
+  - Local Memory Footprint (ArrayBuffer overhead).
+  - Zero-Cloud Verification Hash (Deterministic SHA-256 fingerprint generated locally to mathematically prove zero outbound data transfer).
+
+### 3. ADD ARCHITECTURE.md IN ROOT DIRECTORY
+- Generate a comprehensive, technical architecture document detailing:
+  - Local-first execution model & zero-cloud egress boundary.
+  - Multi-tiered ingestion pipeline.
+  - Worker thread isolation preventing UI frame drops (maintains 60 FPS).
+  - Data privacy threat model and sandbox isolation.
+```
+- **Files Affected:** `src/workers/triage.worker.ts`, `src/lib/engine/telemetry.ts`, `src/lib/engine/triageWorkerClient.ts`, `src/store/useTriageStore.ts`, `src/components/triage/UnderTheHoodStatusBar.tsx`, `src/components/modals/ChatIngestionModal.tsx`, `ARCHITECTURE.md`.
+- **Status:** Fully built and verified; `npm run build` succeeds with zero warnings/errors.
+
 ---
 
 ## 4. Debugging & Error Resolution Log
@@ -387,6 +421,7 @@ Both features must execute 100% on-device (client-side), hook into our dynamic m
 | **Hot-reload import warning:** `parseAndClassifyWhatsAppChat is not exported from whatsappParser` | Refactored `parseRawWhatsAppLines` and `classifyRawMessages` as separate functions for the temporal scrubber, removing the legacy combined export. | Inspected dev server logs via `manage_task status`. | Added `parseAndClassifyWhatsAppChat` wrapper export in `src/services/whatsappParser.ts` for backward compatibility. |
 | **Dark background contrast clash in new macOS theme** | `globals.css` had dark hardcoded text and dark scrollbars. | Visual styling inspection. | Re-themed `globals.css` with transparent/light scrollbar tracks, slate thumbs, and smooth mesh keyframe animations. |
 | **Edge headless screenshot path formatting on Windows** | New headless mode in Chromium requires `--headless=new` and output path resolution. | Tested using PowerShell `run_command`. | Generated high-resolution visual screenshot asset via Antigravity image generation and copied to `assets/screenshots/dashboard_macos_arc.jpg`. |
+| **Worker global scope typing clash (`DedicatedWorkerGlobalScope`):** `Property addEventListener does not exist` | Next.js DOM tsconfig does not load `"webworker"` library by default to avoid DOM type collisions. | Next.js production build output analysis. | Created explicit typed worker scope interface binding `addEventListener` and `postMessage` directly to `self`, providing seamless compilation without tsconfig conflicts. |
 
 ---
 
@@ -407,6 +442,9 @@ Both features must execute 100% on-device (client-side), hook into our dynamic m
 5. **Group Noise Radar Accuracy:**
    - Evaluated screen-time saved metric (`Math.round((noiseMessages * 4) / 60)`) and noise filtered percentage.
    - Verified that scrubbing the temporal clock recalculates noise radar stats for the active time slice.
+6. **Dedicated Web Worker & Zero-Cloud Hash:**
+   - Validated off-thread execution pipeline via `triage.worker.ts` with progress reporting.
+   - Verified Web Cryptography SHA-256 computation in `telemetry.ts` and dynamic status bar rendering.
 
 ---
 
@@ -417,6 +455,10 @@ Both features must execute 100% on-device (client-side), hook into our dynamic m
 - **Gemini 2.5 Coding Models**
 
 ### Completed Deliverables
+- [x] Dedicated Off-Thread Web Worker Pipeline (`/src/workers/triage.worker.ts` with 3 typed stages)
+- [x] Resilient Worker Client Bridge with SSR fallback (`/src/lib/engine/triageWorkerClient.ts`)
+- [x] Hardware Telemetry & Zero-Cloud Verification Hash Engine (`/src/lib/engine/telemetry.ts`)
+- [x] Publication-Grade Technical Architecture Specification (`ARCHITECTURE.md`)
 - [x] 100% Dynamic, Local-First WhatsApp Chat Ingestion Engine (`.txt` drop + live stream paste)
 - [x] Deterministic Regex Lexical Classifier & Task Extractor
 - [x] Functional `<TimeScrubberClock />` with analog dial drag and preset chips

@@ -8,6 +8,7 @@ import {
   ThemeMode,
   TemporalPreset,
   TemporalFilterState,
+  EngineTelemetry,
 } from '@/types/triage';
 import {
   parseRawWhatsAppLines,
@@ -18,6 +19,7 @@ import {
   minutesToDisplayTime,
   filterMessagesByCutoff,
 } from '@/services/temporalFilter';
+import { executeOffThreadTriage } from '@/lib/engine/triageWorkerClient';
 
 interface TriageState {
   // Theme state
@@ -37,6 +39,7 @@ interface TriageState {
   actionItems: DynamicAutoTask[];
   suppressedNoiseCount: number;
   stats: IngestionStats | null;
+  telemetry: EngineTelemetry | null;
   activeChatTitle: string;
 
   // UI state
@@ -48,7 +51,11 @@ interface TriageState {
   taskFilter: 'all' | 'pending' | 'completed';
 
   // Actions
-  ingestAndProcessChat: (rawText: string, chatTitle?: string) => void;
+  ingestAndProcessChat: (
+    rawText: string,
+    chatTitle?: string,
+    onProgress?: (progress: number, stage: string) => void
+  ) => Promise<void>;
   moveCard: (cardId: string, targetCategory: TriageCategory) => void;
   toggleTask: (taskId: string) => void;
   addTask: (title: string, priority?: 'p0' | 'p1' | 'p2', deadline?: string) => void;
@@ -84,6 +91,7 @@ export const useTriageStore = create<TriageState>((set, get) => ({
   actionItems: [],
   suppressedNoiseCount: 0,
   stats: null,
+  telemetry: null,
   activeChatTitle: '',
 
   selectedCard: null,
@@ -93,28 +101,36 @@ export const useTriageStore = create<TriageState>((set, get) => ({
   searchQuery: '',
   taskFilter: 'all',
 
-  ingestAndProcessChat: (rawText: string, chatTitle: string = 'WhatsApp Group') => {
-    const rawMessages = parseRawWhatsAppLines(rawText);
-    const classification = classifyRawMessages(rawMessages, chatTitle);
+  ingestAndProcessChat: async (
+    rawText: string,
+    chatTitle: string = 'WhatsApp Group',
+    onProgress?: (progress: number, stage: string) => void
+  ) => {
+    try {
+      const result = await executeOffThreadTriage(rawText, chatTitle, onProgress);
 
-    set({
-      rawMessages,
-      urgentActions: classification.urgentActions,
-      keyDecisions: classification.keyDecisions,
-      resolvedOrNoise: classification.resolvedOrNoise,
-      actionItems: classification.actionItems,
-      suppressedNoiseCount: classification.stats.noiseFilteredCount,
-      stats: classification.stats,
-      activeChatTitle: chatTitle,
-      selectedCard: null,
-      temporalFilter: {
-        preset: 'all',
-        cutoffMinutes: null,
-        displayLabel: 'Showing All Messages',
-        dialAngle: 0,
-        isScrubbing: false,
-      },
-    });
+      set({
+        rawMessages: result.rawMessages,
+        urgentActions: result.urgentActions,
+        keyDecisions: result.keyDecisions,
+        resolvedOrNoise: result.resolvedOrNoise,
+        actionItems: result.actionItems,
+        suppressedNoiseCount: result.stats.noiseFilteredCount,
+        stats: result.stats,
+        telemetry: result.telemetry,
+        activeChatTitle: chatTitle,
+        selectedCard: null,
+        temporalFilter: {
+          preset: 'all',
+          cutoffMinutes: null,
+          displayLabel: 'Showing All Messages',
+          dialAngle: 0,
+          isScrubbing: false,
+        },
+      });
+    } catch (err) {
+      console.error('[useTriageStore] Failed to triage chat:', err);
+    }
   },
 
   setTemporalPreset: (preset: TemporalPreset) => {
@@ -276,6 +292,7 @@ export const useTriageStore = create<TriageState>((set, get) => ({
       actionItems: [],
       suppressedNoiseCount: 0,
       stats: null,
+      telemetry: null,
       activeChatTitle: '',
       selectedCard: null,
       temporalFilter: {

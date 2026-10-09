@@ -81,26 +81,21 @@ export const ChatIngestionModal: React.FC = () => {
   const executePipeline = async (textToProcess: string, title: string) => {
     if (!textToProcess.trim()) return;
 
-    // Simulated client-side parsing pipeline
     setParsingStage('sanitizing');
-    setProgressPct(30);
+    setProgressPct(25);
 
-    await new Promise((r) => setTimeout(r, 380));
-    setParsingStage('extracting');
-    setProgressPct(65);
+    // Run off-thread triage pipeline via Web Worker
+    await ingestAndProcessChat(textToProcess, title, (progress, stage) => {
+      setProgressPct(progress);
+      if (stage === 'PARSING') setParsingStage('sanitizing');
+      else if (stage === 'TRIAGING') setParsingStage('triaging');
+      else if (stage === 'COMPLETED') setParsingStage('done');
+    });
 
-    await new Promise((r) => setTimeout(r, 420));
-    setParsingStage('triaging');
-    setProgressPct(95);
-
-    await new Promise((r) => setTimeout(r, 300));
     setProgressPct(100);
     setParsingStage('done');
 
-    // Run deterministic classifier & populate dynamic state
-    ingestAndProcessChat(textToProcess, title);
-
-    await new Promise((r) => setTimeout(r, 350));
+    await new Promise((r) => setTimeout(r, 300));
     setParsingStage('idle');
     setProgressPct(0);
     setIngestionModalOpen(false);

@@ -66,3 +66,36 @@ export interface TemporalFilterState {
   dialAngle: number;           // 0 to 360 degrees
   isScrubbing: boolean;
 }
+
+export interface EngineTelemetry {
+  executionTimeMs: number;
+  memoryFootprintKb: number;
+  memoryFreedKb: number;
+  noiseRatio: number;
+  zeroCloudHash: string;
+  throughputMsgPerSec: number;
+  workerThreadId: string;
+  timestamp: string;
+}
+
+export type WorkerStage = 'PARSING' | 'TRIAGING' | 'COMPLETED' | 'ERROR';
+
+export interface WorkerProgressMessage {
+  stage: WorkerStage;
+  progress: number;
+  telemetry?: Partial<EngineTelemetry>;
+}
+
+export interface WorkerResultMessage extends WorkerProgressMessage {
+  stage: 'COMPLETED';
+  progress: 100;
+  payload: {
+    rawMessages: RawChatMessage[];
+    urgentActions: DynamicTriageCard[];
+    keyDecisions: DynamicTriageCard[];
+    resolvedOrNoise: DynamicTriageCard[];
+    actionItems: DynamicAutoTask[];
+    stats: IngestionStats;
+  };
+  telemetry: EngineTelemetry;
+}
