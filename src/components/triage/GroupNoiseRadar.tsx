@@ -40,7 +40,7 @@ export const GroupNoiseRadar: React.FC = () => {
 
         <Radio className="w-3.5 h-3.5 text-indigo-600 shrink-0" />
 
-        <span className="text-slate-600 font-sans font-medium text-[11px]">
+        <span className="text-slate-600 font-sans font-medium text-[11px] hidden md:inline">
           Noise Filtered:
         </span>
 
@@ -55,7 +55,7 @@ export const GroupNoiseRadar: React.FC = () => {
         </motion.span>
 
         {/* Emerald Time-Saved Badge */}
-        <span className="px-1.5 py-0.2 rounded-full bg-emerald-100 text-emerald-800 font-bold text-[10px] font-mono shrink-0 border border-emerald-200/60">
+        <span className="px-1.5 py-0.2 rounded-full bg-emerald-100 text-emerald-800 font-bold text-[10px] font-mono shrink-0 border border-emerald-200/60 hidden sm:inline">
           ~{timeSavedMinutes}m saved
         </span>
 

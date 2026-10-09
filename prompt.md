@@ -409,8 +409,19 @@ Do NOT change the UI styling. Focus 100% on system engineering, modularity, and 
   - Worker thread isolation preventing UI frame drops (maintains 60 FPS).
   - Data privacy threat model and sandbox isolation.
 ```
-- **Files Affected:** `src/workers/triage.worker.ts`, `src/lib/engine/telemetry.ts`, `src/lib/engine/triageWorkerClient.ts`, `src/store/useTriageStore.ts`, `src/components/triage/UnderTheHoodStatusBar.tsx`, `src/components/modals/ChatIngestionModal.tsx`, `ARCHITECTURE.md`.
-- **Status:** Fully built and verified; `npm run build` succeeds with zero warnings/errors.
+### Phase 10: Full Mobile Optimization & Web Column/Sidebar Overlap Fix
+- **AI Tool / Model:** Google Antigravity
+- **Purpose:** Optimize entire application for all mobile screens (phones and tablets) and fix web version layout issue where Column 3 ("Resolved / Noise Filtered") was sliced off by `TaskSidebar`.
+- **Input Prompt:**
+```text
+made this project to mobile optimize in every aspect  2. in webversion  fix the image i attached
+```
+- **Files Affected:** `src/app/page.tsx`, `src/components/triage/Header.tsx`, `src/components/triage/TriageColumn.tsx`, `src/components/triage/TriageCardItem.tsx`, `src/components/triage/TaskSidebar.tsx`, `src/components/triage/TimeScrubberClock.tsx`, `src/components/triage/GroupNoiseRadar.tsx`, `src/components/triage/UnderTheHoodStatusBar.tsx`, `src/components/modals/ChatIngestionModal.tsx`, `src/store/useTriageStore.ts`, `src/app/globals.css`.
+- **Key Solutions:**
+  1. **Web Column 3 & Button Cutoff Fix:** Refactored column min-widths (`min-w-[270px] sm:min-w-[290px] xl:min-w-[310px] w-full min-w-0`), corrected invalid `w-88` class to `w-76 xl:w-80`, wrapped card action buttons with responsive labels (`Reply`, `Context`, `Copy`, `Done`) preventing button overflow.
+  2. **Mobile Slide-Over Drawer:** Transformed `TaskSidebar` into a responsive slide-over drawer on `< lg` screens with background overlay and toggle pill in the header, keeping main triage view clean and uncluttered.
+  3. **Mobile Viewport & Touch Optimization:** Adapted to dynamic viewport units (`100dvh`), added `touch-none` on analog clock dial for glitch-free gesture dragging, and enabled horizontal card snapping (`snap-x snap-mandatory`) across columns.
+- **Status:** Fully built and verified; `npm run build` succeeds with zero errors (Exit code: 0).
 
 ---
 
@@ -422,6 +433,7 @@ Do NOT change the UI styling. Focus 100% on system engineering, modularity, and 
 | **Dark background contrast clash in new macOS theme** | `globals.css` had dark hardcoded text and dark scrollbars. | Visual styling inspection. | Re-themed `globals.css` with transparent/light scrollbar tracks, slate thumbs, and smooth mesh keyframe animations. |
 | **Edge headless screenshot path formatting on Windows** | New headless mode in Chromium requires `--headless=new` and output path resolution. | Tested using PowerShell `run_command`. | Generated high-resolution visual screenshot asset via Antigravity image generation and copied to `assets/screenshots/dashboard_macos_arc.jpg`. |
 | **Worker global scope typing clash (`DedicatedWorkerGlobalScope`):** `Property addEventListener does not exist` | Next.js DOM tsconfig does not load `"webworker"` library by default to avoid DOM type collisions. | Next.js production build output analysis. | Created explicit typed worker scope interface binding `addEventListener` and `postMessage` directly to `self`, providing seamless compilation without tsconfig conflicts. |
+| **Web Column 3 & Action buttons clipped against TaskSidebar** | Static `min-w-[320px]` on columns and invalid `w-88` class caused horizontal overflow beyond visible board boundary on standard displays; non-wrapping button row exceeded card width. | Visual bug analysis of user-provided screenshot. | Re-architected columns with flexible min-widths (`min-w-[270px]`), made sidebar toggleable, added wrap-friendly buttons, and implemented mobile slide-over drawer. |
 
 ---
 

@@ -51,29 +51,29 @@ export const TriageColumn: React.FC<TriageColumnProps> = ({ category, cards }) =
   const IconComponent = config.icon;
 
   return (
-    <div className="flex-1 flex flex-col min-w-[320px] max-w-[440px] rounded-3xl border border-slate-200/80 bg-slate-50/75 backdrop-blur-xl p-4 select-none shadow-xs">
+    <div className="flex-1 flex flex-col min-w-[270px] sm:min-w-[290px] xl:min-w-[310px] max-w-full rounded-2xl sm:rounded-3xl border border-slate-200/80 bg-slate-50/75 backdrop-blur-xl p-3 sm:p-4 select-none shadow-xs transition-all">
       {/* Column Header */}
-      <div className="flex items-center justify-between px-2 py-1 mb-1">
-        <div className="flex items-center gap-2">
-          <span className={`w-2.5 h-2.5 rounded-full ${config.dotClass}`} />
-          <h3 className="text-xs font-bold font-sans tracking-tight text-[#0F172A]">
+      <div className="flex items-center justify-between gap-2 px-1 sm:px-2 py-1 mb-1 min-w-0">
+        <div className="flex items-center gap-1.5 sm:gap-2 min-w-0 flex-1 truncate">
+          <span className={`w-2.5 h-2.5 rounded-full shrink-0 ${config.dotClass}`} />
+          <h3 className="text-xs font-bold font-sans tracking-tight text-[#0F172A] truncate">
             {config.title}
           </h3>
           <span
-            className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded-full ${config.badgeClass}`}
+            className={`text-[10px] font-mono font-bold px-1.5 sm:px-2 py-0.5 rounded-full shrink-0 ${config.badgeClass}`}
           >
             {cards.length}
           </span>
         </div>
 
-        <span className="text-[10px] font-mono uppercase text-slate-500 font-medium">
+        <span className="text-[10px] font-mono uppercase text-slate-500 font-medium shrink-0">
           {config.prioritySubtitle}
         </span>
       </div>
 
       {/* Subtitle / Noise counter */}
-      <div className="px-2 mb-3.5 flex items-center justify-between">
-        <p className="text-[11px] font-sans text-slate-600 leading-relaxed truncate">
+      <div className="px-1 sm:px-2 mb-3 flex items-center justify-between min-w-0">
+        <p className="text-[11px] font-sans text-slate-600 leading-relaxed truncate" title={config.subtitle}>
           {config.subtitle}
         </p>
       </div>

@@ -60,7 +60,7 @@ export default function Home() {
   );
 
   return (
-    <div className="relative w-screen h-screen overflow-hidden flex flex-col p-2.5 sm:p-4 md:p-6 lg:p-7 select-none font-sans antialiased text-[#0F172A]">
+    <div className="relative w-full h-[100dvh] min-h-[100dvh] overflow-hidden flex flex-col p-1.5 sm:p-3 md:p-5 lg:p-6 select-none font-sans antialiased text-[#0F172A]">
       {/* =========================================================================
           1. DYNAMIC COLORFUL BACKGROUND (macOS Sonoma / Aurora Multi-Colored Mesh)
          ========================================================================= */}
@@ -84,19 +84,19 @@ export default function Home() {
       {/* =========================================================================
           2. FROSTED PILLS & DOCK CONTROLS (Arc Browser-style Floating Pills)
          ========================================================================= */}
-      <div className="relative z-20 mb-3 flex items-center justify-between gap-3 px-2">
+      <div className="relative z-20 mb-2 sm:mb-3 flex items-center justify-between gap-2 px-1 sm:px-2 overflow-x-auto no-scrollbar">
         {/* Left: Arc-style Category Pills */}
-        <div className="flex items-center gap-1.5 p-1 rounded-2xl bg-white/45 backdrop-blur-xl border border-white/50 shadow-pill-float">
+        <div className="flex items-center gap-1 sm:gap-1.5 p-1 rounded-2xl bg-white/45 backdrop-blur-xl border border-white/50 shadow-pill-float shrink-0">
           <button
             onClick={() => setTab('all')}
-            className={`px-3 py-1 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all ${
+            className={`px-2.5 sm:px-3 py-1 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all ${
               activeTab === 'all'
                 ? 'bg-white text-[#0F172A] shadow-xs'
                 : 'text-slate-800 hover:text-black hover:bg-white/40'
             }`}
           >
             <Layers className="w-3.5 h-3.5 text-slate-700" />
-            <span>All Cards</span>
+            <span className="whitespace-nowrap">All Cards</span>
             <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-slate-200/80 font-bold text-slate-800">
               {urgentActions.length + keyDecisions.length + resolvedOrNoise.length}
             </span>
@@ -104,14 +104,14 @@ export default function Home() {
 
           <button
             onClick={() => setTab('urgent')}
-            className={`px-3 py-1 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all ${
+            className={`px-2.5 sm:px-3 py-1 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all ${
               activeTab === 'urgent'
                 ? 'bg-white text-rose-700 shadow-xs'
                 : 'text-slate-800 hover:text-black hover:bg-white/40'
             }`}
           >
             <Flame className="w-3.5 h-3.5 text-rose-500" />
-            <span>Urgent</span>
+            <span className="whitespace-nowrap">Urgent</span>
             {urgentActions.length > 0 && (
               <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-rose-100 font-bold text-rose-700">
                 {urgentActions.length}
@@ -121,14 +121,14 @@ export default function Home() {
 
           <button
             onClick={() => setTab('fyi')}
-            className={`px-3 py-1 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all ${
+            className={`px-2.5 sm:px-3 py-1 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all ${
               activeTab === 'fyi'
                 ? 'bg-white text-amber-700 shadow-xs'
                 : 'text-slate-800 hover:text-black hover:bg-white/40'
             }`}
           >
             <Lightbulb className="w-3.5 h-3.5 text-amber-500" />
-            <span>Key Decisions</span>
+            <span className="whitespace-nowrap">Key Decisions</span>
             {keyDecisions.length > 0 && (
               <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-amber-100 font-bold text-amber-800">
                 {keyDecisions.length}
@@ -138,19 +138,19 @@ export default function Home() {
 
           <button
             onClick={() => setTab('resolved')}
-            className={`px-3 py-1 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all ${
+            className={`px-2.5 sm:px-3 py-1 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all ${
               activeTab === 'resolved'
                 ? 'bg-white text-emerald-700 shadow-xs'
                 : 'text-slate-800 hover:text-black hover:bg-white/40'
             }`}
           >
             <CheckCheck className="w-3.5 h-3.5 text-emerald-500" />
-            <span>Resolved</span>
+            <span className="whitespace-nowrap">Resolved</span>
           </button>
         </div>
 
         {/* Right: Quick Arc-Style System Pill */}
-        <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-2xl bg-white/45 backdrop-blur-xl border border-white/50 shadow-pill-float text-xs font-mono text-slate-800 font-medium">
+        <div className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-2xl bg-white/45 backdrop-blur-xl border border-white/50 shadow-pill-float text-xs font-mono text-slate-800 font-medium shrink-0">
           <span className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)]" />
           <span>macOS Sonoma Aurora Glass</span>
           <span className="text-slate-400">•</span>
@@ -161,7 +161,7 @@ export default function Home() {
       {/* =========================================================================
           3. CRISP LIGHT FLOATING DASHBOARD WINDOW (Elevated OS Window)
          ========================================================================= */}
-      <div className="relative z-10 flex-1 flex flex-col w-full max-w-[1740px] mx-auto rounded-[28px] bg-white/92 backdrop-blur-3xl border border-white/60 shadow-window-float overflow-hidden transition-all">
+      <div className="relative z-10 flex-1 flex flex-col w-full max-w-[1740px] mx-auto rounded-xl sm:rounded-2xl md:rounded-[28px] bg-white/92 backdrop-blur-3xl border border-white/60 shadow-window-float overflow-hidden transition-all">
         {/* Top Header inside the window */}
         <Header />
 
@@ -226,8 +226,8 @@ export default function Home() {
               </div>
             ) : viewMode === 'columns' ? (
               /* --- DYNAMIC 3-COLUMN TRIAGE BOARD --- */
-              <div className="flex-1 p-6 overflow-x-auto overflow-y-hidden custom-scrollbar">
-                <div className="h-full flex gap-5 min-w-max">
+              <div className="flex-1 p-3 sm:p-4 md:p-5 lg:p-6 overflow-x-auto overflow-y-hidden custom-scrollbar">
+                <div className="h-full flex gap-3.5 sm:gap-4 lg:gap-5 w-full min-w-0 snap-x snap-mandatory">
                   {(activeTab === 'all' || activeTab === 'urgent') && (
                     <TriageColumn category="urgent" cards={filteredUrgent} />
                   )}

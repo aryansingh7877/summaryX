@@ -109,7 +109,7 @@ export const ChatIngestionModal: React.FC = () => {
   return (
     <AnimatePresence>
       <div
-        className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm select-none"
+        className="fixed inset-0 z-50 flex items-center justify-center p-2.5 sm:p-4 bg-black/40 backdrop-blur-sm select-none"
         onClick={() => setIngestionModalOpen(false)}
       >
         <motion.div
@@ -117,10 +117,10 @@ export const ChatIngestionModal: React.FC = () => {
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 0.95 }}
           onClick={(e) => e.stopPropagation()}
-          className="w-full max-w-xl rounded-3xl border border-slate-200/80 bg-white shadow-2xl flex flex-col overflow-hidden font-sans text-[#0F172A]"
+          className="w-full max-w-xl max-h-[92dvh] rounded-2xl sm:rounded-3xl border border-slate-200/80 bg-white shadow-2xl flex flex-col overflow-hidden font-sans text-[#0F172A]"
         >
           {/* Header */}
-          <div className="p-5 border-b border-slate-200/80 flex items-center justify-between bg-slate-50/70">
+          <div className="p-3.5 sm:p-5 border-b border-slate-200/80 flex items-center justify-between bg-slate-50/70 shrink-0">
             <div className="flex items-center gap-2.5">
               <div className="w-8 h-8 rounded-xl bg-rose-50 text-rose-600 border border-rose-200 flex items-center justify-center">
                 <FileText className="w-4 h-4" />
@@ -144,7 +144,7 @@ export const ChatIngestionModal: React.FC = () => {
           </div>
 
           {/* Modal Body */}
-          <div className="p-6 space-y-4 max-h-[80vh] overflow-y-auto custom-scrollbar">
+          <div className="p-4 sm:p-6 space-y-3 sm:space-y-4 overflow-y-auto custom-scrollbar flex-1">
             {/* Quick Demo Option */}
             <div className="flex items-center justify-between p-3.5 rounded-2xl border border-slate-200 bg-slate-50">
               <div>

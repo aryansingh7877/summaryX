@@ -8,6 +8,7 @@ import {
   Calendar,
   Check,
   ListTodo,
+  X,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -18,6 +19,8 @@ export const TaskSidebar: React.FC = () => {
     addTask,
     taskFilter,
     setTaskFilter,
+    isSidebarOpen,
+    setSidebarOpen,
   } = useTriageStore();
   const [newTitle, setNewTitle] = useState('');
   const [newPriority, setNewPriority] = useState<'p0' | 'p1' | 'p2'>('p1');
@@ -39,15 +42,15 @@ export const TaskSidebar: React.FC = () => {
     setNewTitle('');
   };
 
-  return (
-    <aside className="w-88 h-full flex flex-col select-none shrink-0 transition-colors duration-200 border-l border-slate-200/80 bg-slate-50/50 backdrop-blur-xl text-[#0F172A]">
+  const renderContent = () => (
+    <>
       {/* 1. Functional Temporal Scrubber Clock Widget */}
-      <div className="p-3.5 border-b border-slate-200/70">
+      <div className="p-3 sm:p-3.5 border-b border-slate-200/70">
         <TimeScrubberClock />
       </div>
 
       {/* 2. Action Items Header & Progress */}
-      <div className="p-4 border-b border-slate-200/70">
+      <div className="p-3 sm:p-4 border-b border-slate-200/70">
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-2">
             <ListTodo className="w-4 h-4 text-emerald-600" />
@@ -122,7 +125,7 @@ export const TaskSidebar: React.FC = () => {
                   : 'bg-white border-slate-200/80 hover:border-slate-300 shadow-xs'
               }`}
             >
-              {/* Tactile Rounded Square Checkbox with Smooth Emerald Check Animation */}
+              {/* Tactile Rounded Square Checkbox */}
               <motion.button
                 type="button"
                 whileTap={{ scale: 0.85 }}
@@ -199,7 +202,7 @@ export const TaskSidebar: React.FC = () => {
       {/* 4. Inline Quick Add Task */}
       <form
         onSubmit={handleCreateTask}
-        className="p-3 border-t border-slate-200/70 bg-white/60"
+        className="p-3 border-t border-slate-200/70 bg-white/60 shrink-0"
       >
         <div className="flex items-center gap-1.5">
           <input
@@ -218,6 +221,64 @@ export const TaskSidebar: React.FC = () => {
           </button>
         </div>
       </form>
-    </aside>
+    </>
+  );
+
+  return (
+    <>
+      {/* 1. Desktop Docked Sidebar (lg and up) */}
+      {isSidebarOpen && (
+        <aside className="hidden lg:flex w-76 xl:w-80 h-full flex-col select-none shrink-0 transition-all duration-200 border-l border-slate-200/80 bg-slate-50/50 backdrop-blur-xl text-[#0F172A] overflow-hidden">
+          {renderContent()}
+        </aside>
+      )}
+
+      {/* 2. Mobile Slide-Over Drawer (< lg) */}
+      <AnimatePresence>
+        {isSidebarOpen && (
+          <div className="lg:hidden fixed inset-0 z-50 flex justify-end bg-black/40 backdrop-blur-xs select-none">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0"
+              onClick={() => setSidebarOpen(false)}
+            />
+            <motion.aside
+              initial={{ x: '100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '100%' }}
+              transition={{ type: 'spring', damping: 28, stiffness: 300 }}
+              onClick={(e) => e.stopPropagation()}
+              className="relative z-10 w-full max-w-sm sm:max-w-md h-full flex flex-col bg-white shadow-2xl border-l border-slate-200 text-[#0F172A] overflow-hidden"
+            >
+              {/* Mobile Drawer Title Bar with Close Button */}
+              <div className="p-3.5 border-b border-slate-200 flex items-center justify-between bg-slate-50">
+                <div className="flex items-center gap-2">
+                  <ListTodo className="w-4 h-4 text-emerald-600" />
+                  <span className="text-xs font-bold font-sans text-[#0F172A]">
+                    Clock & Action Items
+                  </span>
+                  {actionItems.length > 0 && (
+                    <span className="text-[10px] font-mono font-bold px-1.5 py-0.2 rounded-full bg-emerald-100 text-emerald-800">
+                      {actionItems.length}
+                    </span>
+                  )}
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setSidebarOpen(false)}
+                  className="p-1 rounded-full text-slate-500 hover:text-black hover:bg-slate-200 transition-colors"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+
+              {renderContent()}
+            </motion.aside>
+          </div>
+        )}
+      </AnimatePresence>
+    </>
   );
 };

@@ -85,8 +85,8 @@ export const TriageCardItem: React.FC<TriageCardItemProps> = ({ card }) => {
       }`}
     >
       {/* Top Header: Sender / Group + Timestamp + Priority Badge */}
-      <div className="flex items-center justify-between gap-2 mb-2.5">
-        <div className="flex items-center gap-2 min-w-0">
+      <div className="flex items-center justify-between gap-1.5 mb-2.5 min-w-0">
+        <div className="flex items-center gap-1.5 min-w-0 flex-1 overflow-hidden">
           {/* Pastel Priority Pill */}
           <span
             className={`text-[10px] font-mono px-2 py-0.5 rounded-full font-bold uppercase shrink-0 ${
@@ -100,18 +100,18 @@ export const TriageCardItem: React.FC<TriageCardItemProps> = ({ card }) => {
             {card.priorityBadge}
           </span>
 
-          <span className="text-xs font-semibold truncate font-sans text-[#0F172A]">
+          <span className="text-xs font-semibold truncate font-sans text-[#0F172A] shrink min-w-0">
             {card.sender}
           </span>
 
-          <span className="text-[10px] font-mono truncate text-slate-500">
+          <span className="text-[10px] font-mono truncate text-slate-500 shrink min-w-0 hidden sm:inline">
             {card.chatName}
           </span>
         </div>
 
-        <div className="flex items-center gap-1 text-[11px] font-mono text-slate-500 shrink-0">
+        <div className="flex items-center gap-1 text-[10px] sm:text-[11px] font-mono text-slate-500 shrink-0 ml-1">
           <Clock className="w-3 h-3 opacity-70" />
-          <span>{card.timestamp}</span>
+          <span className="whitespace-nowrap">{card.timestamp}</span>
         </div>
       </div>
 
@@ -251,11 +251,11 @@ export const TriageCardItem: React.FC<TriageCardItemProps> = ({ card }) => {
             </div>
 
             {/* Instant Action Triggers: Copy Reply & Send via WhatsApp */}
-            <div className="flex items-center justify-between gap-2 pt-1">
+            <div className="flex flex-wrap items-center justify-between gap-2 pt-1">
               <button
                 type="button"
                 onClick={handleCopyGhostwriterReply}
-                className="px-3 py-1.5 rounded-full text-xs font-semibold flex items-center gap-1.5 bg-white hover:bg-slate-50 text-slate-800 border border-slate-200 transition-colors shadow-2xs"
+                className="flex-1 min-w-[110px] px-3 py-1.5 rounded-full text-xs font-semibold flex items-center justify-center gap-1.5 bg-white hover:bg-slate-50 text-slate-800 border border-slate-200 transition-colors shadow-2xs"
               >
                 {copiedGhostwriter ? (
                   <>
@@ -275,7 +275,7 @@ export const TriageCardItem: React.FC<TriageCardItemProps> = ({ card }) => {
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={(e) => e.stopPropagation()}
-                className="px-3 py-1.5 rounded-full text-xs font-semibold flex items-center gap-1.5 bg-[#25D366] hover:bg-[#20BD5A] text-white shadow-xs transition-all scale-100 hover:scale-102 active:scale-98"
+                className="flex-1 min-w-[130px] px-3 py-1.5 rounded-full text-xs font-semibold flex items-center justify-center gap-1.5 bg-[#25D366] hover:bg-[#20BD5A] text-white shadow-xs transition-all scale-100 hover:scale-102 active:scale-98"
               >
                 <Send className="w-3.5 h-3.5" />
                 <span>Send via WhatsApp</span>
@@ -285,26 +285,28 @@ export const TriageCardItem: React.FC<TriageCardItemProps> = ({ card }) => {
         )}
       </AnimatePresence>
 
-      {/* Bottom Row: Quick Action Buttons */}
-      <div className="pt-2.5 border-t border-slate-100 flex items-center justify-between gap-1">
-        <div className="flex items-center gap-1.5">
+      {/* Bottom Row: Quick Action Buttons (Wrap-friendly, zero cutoff) */}
+      <div className="pt-2.5 border-t border-slate-100 flex flex-wrap items-center justify-between gap-1.5">
+        <div className="flex items-center gap-1 sm:gap-1.5 flex-wrap">
           {/* Quick Reply (Context Ghostwriter Toggle) */}
           <button
+            type="button"
             onClick={handleToggleGhostwriter}
-            className={`px-2.5 py-1 rounded-full text-[11px] font-sans font-semibold flex items-center gap-1 transition-all ${
+            className={`px-2 sm:px-2.5 py-1 rounded-full text-[11px] font-sans font-semibold flex items-center gap-1 transition-all ${
               isGhostwriterOpen
                 ? 'bg-indigo-600 text-white shadow-xs'
                 : 'bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200/80'
             }`}
           >
             <Sparkles className="w-3 h-3 text-indigo-500" />
-            <span>Quick Reply</span>
+            <span>Reply</span>
           </button>
 
           {/* View Context */}
           <button
+            type="button"
             onClick={handleViewContext}
-            className="px-2.5 py-1 rounded-full text-[11px] font-sans font-medium flex items-center gap-1 bg-slate-100/80 hover:bg-slate-200/80 text-[#0F172A] border border-slate-200/70 transition-colors"
+            className="px-2 sm:px-2.5 py-1 rounded-full text-[11px] font-sans font-medium flex items-center gap-1 bg-slate-100/80 hover:bg-slate-200/80 text-[#0F172A] border border-slate-200/70 transition-colors"
           >
             <Eye className="w-3 h-3 text-slate-500" />
             <span>Context</span>
@@ -312,14 +314,15 @@ export const TriageCardItem: React.FC<TriageCardItemProps> = ({ card }) => {
 
           {/* Fast Copy Reply */}
           <button
+            type="button"
             onClick={handleCopyReply}
             title={`Copy: "${card.suggestedReply}"`}
-            className="px-2.5 py-1 rounded-full text-[11px] font-sans font-medium flex items-center gap-1 bg-slate-100/80 hover:bg-slate-200/80 text-[#0F172A] border border-slate-200/70 transition-colors"
+            className="px-2 sm:px-2.5 py-1 rounded-full text-[11px] font-sans font-medium flex items-center gap-1 bg-slate-100/80 hover:bg-slate-200/80 text-[#0F172A] border border-slate-200/70 transition-colors"
           >
             {copied ? (
               <>
                 <Check className="w-3 h-3 text-emerald-600 stroke-[2.5]" />
-                <span className="text-emerald-700 font-semibold">Copied!</span>
+                <span className="text-emerald-700 font-semibold">Copied</span>
               </>
             ) : (
               <>
@@ -332,9 +335,10 @@ export const TriageCardItem: React.FC<TriageCardItemProps> = ({ card }) => {
 
         {/* Mark as Done / Undo */}
         <button
+          type="button"
           onClick={handleDoneToggle}
           title={isResolved ? 'Re-open card' : 'Mark as Done'}
-          className={`px-3 py-1 rounded-full text-[11px] font-sans font-medium flex items-center gap-1 transition-colors ${
+          className={`px-2.5 sm:px-3 py-1 rounded-full text-[11px] font-sans font-medium flex items-center gap-1 transition-colors shrink-0 ${
             isResolved
               ? 'bg-slate-100 hover:bg-slate-200 text-slate-600 border border-slate-200'
               : 'bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 font-semibold'
@@ -348,7 +352,7 @@ export const TriageCardItem: React.FC<TriageCardItemProps> = ({ card }) => {
           ) : (
             <>
               <Check className="w-3 h-3 text-emerald-600 stroke-[2.5]" />
-              <span>Mark Done</span>
+              <span>Done</span>
             </>
           )}
         </button>

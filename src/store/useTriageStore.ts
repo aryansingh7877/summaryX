@@ -45,6 +45,7 @@ interface TriageState {
   // UI state
   selectedCard: DynamicTriageCard | null;
   isIngestionModalOpen: boolean;
+  isSidebarOpen: boolean;
   activeTab: 'all' | TriageCategory;
   viewMode: 'columns' | 'list';
   searchQuery: string;
@@ -61,6 +62,8 @@ interface TriageState {
   addTask: (title: string, priority?: 'p0' | 'p1' | 'p2', deadline?: string) => void;
   selectCard: (card: DynamicTriageCard | null) => void;
   setIngestionModalOpen: (open: boolean) => void;
+  setSidebarOpen: (open: boolean) => void;
+  toggleSidebar: () => void;
   setTab: (tab: 'all' | TriageCategory) => void;
   setViewMode: (mode: 'columns' | 'list') => void;
   setSearchQuery: (query: string) => void;
@@ -96,6 +99,7 @@ export const useTriageStore = create<TriageState>((set, get) => ({
 
   selectedCard: null,
   isIngestionModalOpen: false,
+  isSidebarOpen: true,
   activeTab: 'all',
   viewMode: 'columns',
   searchQuery: '',
@@ -274,6 +278,10 @@ export const useTriageStore = create<TriageState>((set, get) => ({
   selectCard: (card) => set({ selectedCard: card }),
 
   setIngestionModalOpen: (open) => set({ isIngestionModalOpen: open }),
+
+  setSidebarOpen: (open) => set({ isSidebarOpen: open }),
+
+  toggleSidebar: () => set((state) => ({ isSidebarOpen: !state.isSidebarOpen })),
 
   setTab: (tab) => set({ activeTab: tab }),
 

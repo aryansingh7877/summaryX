@@ -116,7 +116,7 @@ export const TimeScrubberClock: React.FC = () => {
         <div
           ref={clockRef}
           onPointerDown={handlePointerDown}
-          className="relative w-28 h-28 rounded-full bg-[#F8FAFC] border-2 border-slate-200 shadow-inner cursor-grab active:cursor-grabbing flex items-center justify-center transition-all"
+          className="relative w-28 h-28 rounded-full bg-[#F8FAFC] border-2 border-slate-200 shadow-inner cursor-grab active:cursor-grabbing flex items-center justify-center transition-all touch-none"
           title="Click and drag dial to rewind chat messages in real time"
         >
           {/* 12 Hour Subtle Ticks */}
