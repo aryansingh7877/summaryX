@@ -59,9 +59,10 @@ npm run start
 
 ---
 
-## 📄 Development Process & Vibe Coding Logs
+## 📄 Documentation & Hackathon Logs
 
-For the full hackathon prompt history, architecture evolution, and debugging logs, see [**`projectprompt.md`**](./projectprompt.md).
+- **AI Prompt History & Vibe Coding Log:** [**`prompt.md`**](./prompt.md)
+- **Technical Architecture Specification & Benchmarks:** [**`ARCHITECTURE.md`**](./ARCHITECTURE.md)
 
 ---
 
