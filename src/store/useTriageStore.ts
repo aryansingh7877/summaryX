@@ -167,6 +167,7 @@ export const useTriageStore = create<TriageState>((set, get) => ({
       keyDecisions: classification.keyDecisions,
       actionItems: classification.actionItems,
       suppressedNoiseCount: classification.stats.noiseFilteredCount,
+      stats: classification.stats,
     });
   },
 
@@ -201,6 +202,7 @@ export const useTriageStore = create<TriageState>((set, get) => ({
       keyDecisions: classification.keyDecisions,
       actionItems: classification.actionItems,
       suppressedNoiseCount: classification.stats.noiseFilteredCount,
+      stats: classification.stats,
     });
   },
 

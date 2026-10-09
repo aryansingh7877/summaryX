@@ -12,6 +12,7 @@ import {
   Sparkles,
   ShieldCheck,
 } from 'lucide-react';
+import { GroupNoiseRadar } from './GroupNoiseRadar';
 
 export const Header: React.FC = () => {
   const {
@@ -82,6 +83,9 @@ export const Header: React.FC = () => {
             <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
             <span>Offline & Secure (0 Cloud Bytes)</span>
           </div>
+
+          {/* Group Noise Radar Metric */}
+          <GroupNoiseRadar />
         </div>
 
         {/* Center: Frosted Search Bar Pill */}

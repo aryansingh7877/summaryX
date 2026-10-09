@@ -8,17 +8,24 @@ export interface RawChatMessage {
 
 export type TriageCategory = 'urgent' | 'fyi' | 'resolved';
 
+export interface SmartReplies {
+  commit: string;
+  decline: string;
+}
+
 export interface DynamicTriageCard {
   id: string;
   sourceMessageIndex: number;
   chatName: string;
   sender: string;
+  senderPhone?: string;
   timestamp: string;
   category: TriageCategory;
   summary: string;
   priorityBadge: 'P0' | 'P1' | 'P2';
   actionTags: string[];
   suggestedReply: string;
+  smartReplies: SmartReplies;
   entities: {
     dates: string[];
     names: string[];
@@ -44,6 +51,8 @@ export interface IngestionStats {
   fyiCount: number;
   actionItemsCount: number;
   parsedAt: string | null;
+  noisePercentage: number;
+  timeSavedMinutes: number;
 }
 
 export type ThemeMode = 'daylight' | 'midnight';

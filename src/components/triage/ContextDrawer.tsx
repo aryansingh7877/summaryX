@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useTriageStore } from '@/store/useTriageStore';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -10,11 +10,22 @@ import {
   Check,
   Sparkles,
   ShieldCheck,
+  Send,
+  CheckCircle2,
 } from 'lucide-react';
 
 export const ContextDrawer: React.FC = () => {
   const { rawMessages, selectedCard, selectCard, moveCard } = useTriageStore();
   const [copied, setCopied] = useState(false);
+  const [activeStrategy, setActiveStrategy] = useState<'commit' | 'decline'>('commit');
+  const [customReply, setCustomReply] = useState('');
+
+  useEffect(() => {
+    if (selectedCard) {
+      setCustomReply(selectedCard.smartReplies?.commit || selectedCard.suggestedReply);
+      setActiveStrategy('commit');
+    }
+  }, [selectedCard]);
 
   // Exact real slice of messages around that timestamp from rawMessages
   const contextSlice = useMemo(() => {
@@ -32,10 +43,14 @@ export const ContextDrawer: React.FC = () => {
   const isResolved = selectedCard.category === 'resolved';
 
   const handleCopyReply = () => {
-    navigator.clipboard.writeText(selectedCard.suggestedReply);
+    navigator.clipboard.writeText(customReply);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
+
+  const whatsappUrl = selectedCard.senderPhone
+    ? `https://wa.me/${selectedCard.senderPhone}?text=${encodeURIComponent(customReply)}`
+    : `https://wa.me/?text=${encodeURIComponent(customReply)}`;
 
   return (
     <AnimatePresence>
@@ -99,7 +114,7 @@ export const ContextDrawer: React.FC = () => {
           </div>
 
           {/* Drawer Body */}
-          <div className="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar">
+          <div className="flex-1 overflow-y-auto p-6 space-y-5 custom-scrollbar">
             {/* 1-Sentence Summary */}
             <div className="p-4 rounded-2xl border border-slate-200 bg-slate-50/70 space-y-1">
               <div className="text-[10px] font-mono uppercase tracking-wider font-bold text-slate-500">
@@ -127,33 +142,104 @@ export const ContextDrawer: React.FC = () => {
               </div>
             </div>
 
-            {/* Suggested Reply */}
-            <div className="p-4 rounded-2xl border border-emerald-200 bg-emerald-50/30 space-y-2">
-              <div className="flex items-center justify-between text-xs font-mono text-emerald-700 font-bold">
+            {/* Context Ghostwriter Box in Drawer */}
+            <div className="p-4 rounded-2xl border border-indigo-200/90 bg-indigo-50/40 space-y-3">
+              <div className="flex items-center justify-between text-xs font-bold text-indigo-950 font-sans">
                 <span className="flex items-center gap-1.5">
-                  <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
-                  Suggested Fast Reply
+                  <Sparkles className="w-4 h-4 text-indigo-600" />
+                  Context Ghostwriter
                 </span>
+                <span className="text-[10px] font-mono font-semibold text-indigo-700 bg-indigo-100/80 px-2 py-0.5 rounded-full">
+                  Direct Response
+                </span>
+              </div>
+
+              {/* Strategy Selector Pills */}
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setActiveStrategy('commit');
+                    setCustomReply(
+                      selectedCard.smartReplies?.commit || selectedCard.suggestedReply
+                    );
+                  }}
+                  className={`p-2 rounded-xl text-left border transition-all text-xs flex flex-col gap-1 ${
+                    activeStrategy === 'commit'
+                      ? 'bg-white border-emerald-400 ring-2 ring-emerald-400/20 shadow-xs'
+                      : 'bg-white/80 border-slate-200/90 hover:border-slate-300'
+                  }`}
+                >
+                  <span className="text-[9px] font-mono font-bold px-1.5 py-0.2 rounded-full bg-emerald-100 text-emerald-800 w-fit">
+                    COMMIT
+                  </span>
+                  <span className="text-[11px] leading-tight text-slate-800 line-clamp-2">
+                    {selectedCard.smartReplies?.commit || selectedCard.suggestedReply}
+                  </span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setActiveStrategy('decline');
+                    setCustomReply(
+                      selectedCard.smartReplies?.decline ||
+                        'Currently tied up with another priority; will follow up later.'
+                    );
+                  }}
+                  className={`p-2 rounded-xl text-left border transition-all text-xs flex flex-col gap-1 ${
+                    activeStrategy === 'decline'
+                      ? 'bg-white border-amber-400 ring-2 ring-amber-400/20 shadow-xs'
+                      : 'bg-white/80 border-slate-200/90 hover:border-slate-300'
+                  }`}
+                >
+                  <span className="text-[9px] font-mono font-bold px-1.5 py-0.2 rounded-full bg-amber-100 text-amber-800 w-fit">
+                    PUSHBACK
+                  </span>
+                  <span className="text-[11px] leading-tight text-slate-800 line-clamp-2">
+                    {selectedCard.smartReplies?.decline ||
+                      'Currently tied up with another priority; will follow up later.'}
+                  </span>
+                </button>
+              </div>
+
+              {/* Editable Textarea */}
+              <textarea
+                rows={2}
+                value={customReply}
+                onChange={(e) => setCustomReply(e.target.value)}
+                className="w-full p-2.5 rounded-xl border border-slate-300 bg-white text-xs font-sans text-[#0F172A] focus:outline-none focus:border-indigo-500 shadow-2xs leading-relaxed"
+                placeholder="Customize your response message..."
+              />
+
+              {/* Action Buttons */}
+              <div className="flex items-center justify-between gap-2 pt-1">
                 <button
                   onClick={handleCopyReply}
-                  className="px-2 py-0.5 rounded-full bg-emerald-100/70 hover:bg-emerald-200 text-emerald-800 border border-emerald-300 text-[10px] font-mono flex items-center gap-1 transition-colors"
+                  className="px-3 py-1.5 rounded-full bg-white hover:bg-slate-50 text-slate-800 border border-slate-300 text-xs font-semibold flex items-center gap-1.5 shadow-2xs transition-colors"
                 >
                   {copied ? (
                     <>
-                      <Check className="w-3 h-3 text-emerald-700 stroke-[2.5]" />
-                      <span>Copied!</span>
+                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                      <span className="text-emerald-700 font-bold">Copied!</span>
                     </>
                   ) : (
                     <>
-                      <Copy className="w-3 h-3" />
+                      <Copy className="w-3.5 h-3.5 text-slate-500" />
                       <span>Copy Reply</span>
                     </>
                   )}
                 </button>
-              </div>
 
-              <div className="p-2.5 rounded-xl text-xs font-mono leading-relaxed border border-slate-200 bg-white text-[#0F172A]">
-                &quot;{selectedCard.suggestedReply}&quot;
+                <a
+                  href={whatsappUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-3.5 py-1.5 rounded-full bg-[#25D366] hover:bg-[#20BD5A] text-white text-xs font-semibold flex items-center gap-1.5 shadow-xs transition-all scale-100 hover:scale-102 active:scale-98"
+                >
+                  <Send className="w-3.5 h-3.5" />
+                  <span>Send via WhatsApp</span>
+                </a>
               </div>
             </div>
 

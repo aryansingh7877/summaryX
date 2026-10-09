@@ -330,8 +330,53 @@ Refactor the theme and visual styling of our WhatsApp Triage Dashboard to match 
 
 Ensure all existing dynamic state, real-time file parsing, and temporal clock logic remain 100% functional while swapping the dark container styles to this light, colorful floating window design.
 ```
-- **Files Affected:** `src/app/page.tsx`, `src/app/globals.css`, `tailwind.config.ts`, `src/components/triage/Header.tsx`, `src/components/triage/TimeScrubberClock.tsx`, `src/components/triage/TriageColumn.tsx`, `src/components/triage/TriageCardItem.tsx`, `src/components/triage/TaskSidebar.tsx`, `src/components/triage/UnderTheHoodStatusBar.tsx`, `src/components/triage/ContextDrawer.tsx`, `src/components/modals/ChatIngestionModal.tsx`.
-- **Status:** Completed. Verified with `next build` (exit code 0).
+### Phase 8: One-Click Context Ghostwriter & Group Noise Radar
+- **AI Tool / Model:** Google Antigravity
+- **Purpose:** Implement 100% on-device direct reply workflow (Context Ghostwriter) and screen-time saved metric (Group Noise Radar).
+- **Input Prompt:**
+```text
+Act as a Principal Full-Stack Engineer and Product Designer.
+
+Implement two high-impact differentiator features into our current Light-Mode WhatsApp Triage Dashboard:
+1. "One-Click Context Ghostwriter" (Actionable direct reply workflow)
+2. "Group Noise Radar" (Quantifiable productivity & time-saved metric)
+
+Both features must execute 100% on-device (client-side), hook into our dynamic message state, and maintain our crisp light macOS/Arc floating glass aesthetic.
+
+### FEATURE 1: ONE-CLICK CONTEXT GHOSTWRITER (Direct Reply System)
+1. UI Integration on Action Cards:
+- Add a subtle, tactile "Quick Reply" button on every Urgent Action (P0/P1) card.
+- Clicking it smoothly expands an inline accordion or slides open a lightweight reply drawer.
+2. Context-Aware Smart Suggestions (Deterministic Client-Side Logic):
+- Based on the detected intent (e.g., questions, deadline inquiries, requests for files/approvals), dynamically generate two concise, professional reply pills:
+  - Option A (Commit / Agree): e.g., "Understood — will wrap this up and send it over within 30 minutes."
+  - Option B (Decline / Pushback): e.g., "Currently blocked on another priority; can only look into this after 5:00 PM."
+- Allow the user to click either pill to populate an editable text field, or type their own custom modification.
+3. Instant Action Triggers:
+- "Copy Reply" button: Copies the message to the clipboard with a smooth visual "Copied!" checkmark feedback.
+- "Send via WhatsApp" button: A direct action linking to:
+  `https://wa.me/?text=${encodeURIComponent(replyText)}`
+  (or with the sender's phone number if detected in the chat log: `https://wa.me/${senderPhone}?text=...`), opening WhatsApp Web/Desktop with the text pre-filled.
+
+### FEATURE 2: GROUP NOISE RADAR (The Screen-Time Saved Metric)
+1. Dynamic Calculation Engine (In Client Parser):
+- Analyze all parsed lines from the uploaded chat log and compute live stats:
+  - `totalMessages`: Total lines ingested.
+  - `noiseMessages`: Count of casual banter lines (e.g., words <= 3, short reactions like "ok", "k", "lol", "done", "👍", stickers, audio message notices).
+  - `noisePercentage`: `Math.round((noiseMessages / totalMessages) * 100)`
+  - `timeSavedMinutes`: Estimate saved time based on an average reading speed of 4 seconds per message: `Math.max(1, Math.round((noiseMessages * 4) / 60))`.
+2. Visual UI Presentation:
+- Place a sleek, frosted pill widget in the top header (next to the "Offline & Secure" indicator).
+- Content:
+  - A subtle radar or shield icon with a micro pulse animation.
+  - Label: `Noise Filtered: {noisePercentage}%`
+  - Hover / Tooltip Dropdown: Shows a clean summary breakdown:
+    - "{noiseMessages} irrelevant messages suppressed ('ok', 'lol', reactions)"
+    - "Estimated reading time saved: ~{timeSavedMinutes} mins"
+- When a new chat file is uploaded, smoothly count up the numbers from 0 using Framer Motion.
+```
+- **Files Affected:** `src/types/triage.ts`, `src/services/whatsappParser.ts`, `src/store/useTriageStore.ts`, `src/components/triage/GroupNoiseRadar.tsx`, `src/components/triage/Header.tsx`, `src/components/triage/TriageCardItem.tsx`, `src/components/triage/ContextDrawer.tsx`.
+- **Status:** Completed & verified with `next build`.
 
 ---
 
@@ -356,6 +401,12 @@ Ensure all existing dynamic state, real-time file parsing, and temporal clock lo
 3. **Temporal Scrubber Functional Slicing:**
    - Decoupled parsing (`parseRawWhatsAppLines`) from classifier evaluation (`classifyRawMessages`).
    - Clock dragging recalculates time cutoffs in $<2\text{ms}$ with zero dial stutter.
+4. **Context Ghostwriter Direct Triggers:**
+   - Verified clipboard copy with checkmark state.
+   - Tested direct `https://wa.me/` URI generation with encoded reply text and parsed sender phone number.
+5. **Group Noise Radar Accuracy:**
+   - Evaluated screen-time saved metric (`Math.round((noiseMessages * 4) / 60)`) and noise filtered percentage.
+   - Verified that scrubbing the temporal clock recalculates noise radar stats for the active time slice.
 
 ---
 
@@ -369,6 +420,8 @@ Ensure all existing dynamic state, real-time file parsing, and temporal clock lo
 - [x] 100% Dynamic, Local-First WhatsApp Chat Ingestion Engine (`.txt` drop + live stream paste)
 - [x] Deterministic Regex Lexical Classifier & Task Extractor
 - [x] Functional `<TimeScrubberClock />` with analog dial drag and preset chips
+- [x] One-Click Context Ghostwriter (Option A Commit / Option B Pushback pills + WhatsApp direct link)
+- [x] Group Noise Radar Widget (real-time noise % & reading time saved calculation)
 - [x] 3-Column Triage Board (Urgent P0/P1, Decisions & FYI P2, Suppressed Noise)
 - [x] Real-time Action Items Checklist with tactile spring animations
 - [x] Surrounding Message Context Slice Drawer

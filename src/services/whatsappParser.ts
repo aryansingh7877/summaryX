@@ -24,6 +24,85 @@ const DECISION_REGEX = /\b(approved|decided|finalized|update|announcement|link|h
 // Action item task generator regex
 const TASK_PATTERNS = /\b(need to|please|make sure to|assigned to|fix|transfer|deploy|submit|review|prepare|finish)\b/i;
 
+/**
+ * Extract clean numeric phone number if sender is formatted as a phone number
+ */
+export function extractSenderPhone(sender: string): string | undefined {
+  const digits = sender.replace(/[^0-9]/g, '');
+  if (digits.length >= 10) {
+    return digits;
+  }
+  return undefined;
+}
+
+/**
+ * Context-Aware Ghostwriter Smart Reply Generator (Deterministic Client-Side)
+ * Produces: Option A (Commit / Agree) and Option B (Decline / Pushback)
+ */
+export function generateSmartReplies(
+  text: string,
+  sender: string,
+  timeMatch?: string | null
+): {
+  commit: string;
+  decline: string;
+} {
+  const isDeploy = /deploy|staging|docker|build|release|prod|server/i.test(text);
+  const isReview = /review|slide|deck|pr|figma|doc|spec|check/i.test(text);
+  const isPayment = /payment|fee|transfer|dues|upi|invoice|bill/i.test(text);
+  const isMeeting = /sync|meeting|call|round|presentation|demo|interview/i.test(text);
+  const isQuestion = /\?|what|when|where|who|why|can you|could you|please/i.test(text);
+
+  if (isDeploy) {
+    return {
+      commit: timeMatch
+        ? `Understood — on it now. Will finalize the deployment before ${timeMatch}.`
+        : `Understood — on it now. Finalizing deployment script and staging link.`,
+      decline: `Currently blocked on another priority; can only look into the deployment after 5:00 PM.`,
+    };
+  }
+
+  if (isReview) {
+    return {
+      commit: timeMatch
+        ? `Will review the slides and notes by ${timeMatch} after testing.`
+        : `Reviewed the materials — everything looks solid and ready for sign-off.`,
+      decline: `Tied up with blockers right now; can only do a detailed review later today.`,
+    };
+  }
+
+  if (isPayment) {
+    return {
+      commit: `Transferred the amount via UPI. Sharing reference transaction receipt now.`,
+      decline: `Cannot process payment right now; will verify invoice details by EOD.`,
+    };
+  }
+
+  if (isMeeting) {
+    return {
+      commit: timeMatch
+        ? `Noted! Confirmed my availability for the ${timeMatch} sync.`
+        : `Understood — will be present and have the demo materials prepared.`,
+      decline: `Have a conflict at that time; could someone please share meeting notes afterwards?`,
+    };
+  }
+
+  if (isQuestion) {
+    return {
+      commit: `Yes, confirmed. Working on this and will send updates shortly.`,
+      decline: `Need a bit more context on this first before confirming. Let's sync briefly.`,
+    };
+  }
+
+  // Default urgent fallback
+  return {
+    commit: timeMatch
+      ? `Understood — will wrap this up and send it over before ${timeMatch}.`
+      : `Acknowledged — working on this now and will update shortly.`,
+    decline: `Currently blocked on another priority; will look into this as soon as free.`,
+  };
+}
+
 export const SAMPLE_HACKATHON_CHAT_TEXT = `[09/10/26, 08:30:12 AM] Alex Rivera: Good morning team! Hackathon submission day is here 🚀
 [09/10/26, 08:32:40 AM] Maya Lin: gm everyone!!
 [09/10/26, 08:35:00 AM] Dev Liam: morning 🙌
@@ -187,24 +266,22 @@ export function classifyRawMessages(
         actionTags.push('Requires Sign-off');
       }
 
-      let suggestedReply = 'Acknowledged — working on this now and will update shortly.';
-      if (/payment|fee|transfer/i.test(text)) {
-        suggestedReply = 'Transferred the amount via UPI. Reference receipt shared.';
-      } else if (/review|slide|deck/i.test(text)) {
-        suggestedReply = 'Reviewed the materials — looks ready for submission.';
-      }
+      const senderPhone = extractSenderPhone(msg.sender);
+      const smartReplies = generateSmartReplies(text, msg.sender, timeMatch ? timeMatch[0] : null);
 
       urgentActions.push({
         id: `urgent-${msg.index}-${msg.id}`,
         sourceMessageIndex: msg.index,
         chatName: chatTitle,
         sender: msg.sender,
+        senderPhone,
         timestamp: msg.timestamp,
         category: 'urgent',
         summary: `${msg.sender}: "${text.length > 95 ? text.slice(0, 92) + '...' : text}"`,
         priorityBadge: /urgent|asap|blocker|deadline|emergency/i.test(text) ? 'P0' : 'P1',
         actionTags,
-        suggestedReply,
+        suggestedReply: smartReplies.commit,
+        smartReplies,
         entities: {
           dates: timeMatch ? [timeMatch[0]] : [],
           names: [msg.sender],
@@ -226,17 +303,25 @@ export function classifyRawMessages(
         actionTags.push('Link Shared');
       }
 
+      const senderPhone = extractSenderPhone(msg.sender);
+      const smartReplies = {
+        commit: 'Noted and aligned with this update. Proceeding accordingly.',
+        decline: 'Have a few questions/reservations regarding this update; let us discuss.',
+      };
+
       keyDecisions.push({
         id: `fyi-${msg.index}-${msg.id}`,
         sourceMessageIndex: msg.index,
         chatName: chatTitle,
         sender: msg.sender,
+        senderPhone,
         timestamp: msg.timestamp,
         category: 'fyi',
         summary: `${msg.sender}: "${text.length > 95 ? text.slice(0, 92) + '...' : text}"`,
         priorityBadge: 'P2',
         actionTags,
-        suggestedReply: 'Noted with thanks.',
+        suggestedReply: smartReplies.commit,
+        smartReplies,
         entities: {
           dates: timeMatch ? [timeMatch[0]] : [],
           names: [msg.sender],
@@ -248,17 +333,23 @@ export function classifyRawMessages(
 
     // 5. Informative conversation (long enough)
     if (words.length >= 6) {
+      const senderPhone = extractSenderPhone(msg.sender);
       keyDecisions.push({
         id: `fyi-${msg.index}-${msg.id}`,
         sourceMessageIndex: msg.index,
         chatName: chatTitle,
         sender: msg.sender,
+        senderPhone,
         timestamp: msg.timestamp,
         category: 'fyi',
         summary: `${msg.sender}: "${text.length > 95 ? text.slice(0, 92) + '...' : text}"`,
         priorityBadge: 'P2',
         actionTags: ['Discussion'],
         suggestedReply: 'Understood.',
+        smartReplies: {
+          commit: 'Understood and acknowledged.',
+          decline: 'Need to review this further before confirming.',
+        },
         entities: {
           dates: [],
           names: [msg.sender],
@@ -270,13 +361,19 @@ export function classifyRawMessages(
     }
   });
 
+  const totalParsed = messages.length;
+  const noisePercentage = totalParsed > 0 ? Math.round((noiseFilteredCount / totalParsed) * 100) : 0;
+  const timeSavedMinutes = noiseFilteredCount > 0 ? Math.max(1, Math.round((noiseFilteredCount * 4) / 60)) : 0;
+
   const stats: IngestionStats = {
-    totalParsed: messages.length,
+    totalParsed,
     noiseFilteredCount,
     urgentCount: urgentActions.length,
     fyiCount: keyDecisions.length,
     actionItemsCount: actionItems.length,
     parsedAt: new Date().toLocaleTimeString(),
+    noisePercentage,
+    timeSavedMinutes,
   };
 
   return {
